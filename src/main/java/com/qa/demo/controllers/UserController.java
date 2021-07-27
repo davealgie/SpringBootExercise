@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,81 +19,50 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.qa.demo.models.User;
+import com.qa.demo.services.UserService;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 	
-	private List<User> users;
+	private UserService userService;
 	
-	public UserController() {
-		this.users = new ArrayList<>();
-		this.users.add(new User(1, "Pat", 23 ,"PatsEmail@bruh.com"));
-		this.users.add(new User(2, "Dave", 28 ,"DavesEmail@bruh.com"));
-	
+	@Autowired //triggers dependency injection
+	public UserController(UserService userService) {
+		this.userService = userService;
 	}
 	
 	@PutMapping("/{id}")
 	public User updateUser(@PathVariable("id") int id, @RequestBody User user) {
-		for (User a : users) {
-			if (a.getId() == id) {
-				a.setAge(user.getAge());
-				a.setEmail(user.getEmail());
-				a.setName(user.getName());
-				
-				return a;
-			}
-		}
-		return null;
+		return this.userService.updateUser(id, user);
 	}
 	
 	@GetMapping
 	public List<User> getUsers() {
-		return this.users;
+		return this.userService.getUsers();
 	}
 
 	@GetMapping("/{id}")
 	public User getUserbyId(@PathVariable("id")int id) {
-		for (User user : users) {
-			if (user.getId() == id) {
-				return user;
-			}
-		}
-		return null;
+		return this.userService.getUserbyId(id);
 	}
 	
 	// localhost:8080/user/email?email=GeorgeEmail@bruh.com
 	@GetMapping("/email")
     public List<User> getUsersByEmail(@RequestParam("email") String email) {
-    return users.stream()
-            .filter(u -> u.getEmail().equals(email))
-            .collect(Collectors.toList());
+		return this.userService.getUsersByEmail(email);
 	}
 	
 	@PostMapping
 	public User createUser(@Valid @RequestBody User user) {
-		this.users.add(user);
-		return user;
+		return this.userService.createUser(user);
 	}
 	
 	@DeleteMapping("/{id}")
 	public void deleteUser(@PathVariable("id") int id) {
-		for (int i = 0; i < users.size(); i++) {
-			User a = users.get(i);
-			
-			if (a.getId() == id) {
-				this.users.remove(a);
-				break;
-			}
-		}
+		this.userService.deleteUser(id);
 	}
 	
-	/*
-	 * @DeleteMapping("/{id}") - This works but throws "status": 500,"error": "Internal Server Error"!
-	 * public void deleteUser(@PathVariable("id") int id) {
-	 * this.users.forEach(a -> { if (a.getId() == id) {  
-	 * this.users.remove(a); } });
-	 * }
-	 */
+	
 
 }
