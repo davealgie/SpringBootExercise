@@ -1,15 +1,18 @@
 package com.qa.demo.models;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 
 @Entity
+@Table(name = "user")
 public class User {
 	
 	@Id
@@ -23,6 +26,8 @@ public class User {
 	@Max(100)
 	private int age;
 	
+	
+	@Column(name = "email", unique = true)
 	private String email;
 	
 	
